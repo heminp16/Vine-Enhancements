@@ -1,0 +1,400 @@
+/* Adjusted Vine-Styling code to display three tiles, rather than four + support for new Amazon Mobile format */
+/* Plus mobile sheet fixes */
+/* skyline */
+/* Credits: @thorvarium */
+
+:root {
+  --default-item-tile-height: 30px;
+  --default-grid-column: 90px;
+  --default-max-product-title: 100px;
+  --default-product-title-text-size: 10px;
+  --default-cutoff-background-color: #d1d1d1;
+
+  --dark-background-color: #121212;
+  --dark-text-color: #e0e0e0;
+  --dark-primary-color: #bb86fc;
+  --dark-button-background: #303333;
+  --dark-button-hover: #383838;
+  --dark-cutoff-background-color: #2a2a2a;
+
+  --item-tile-height: var(--custom-item-tile-height, var(--default-item-tile-height));
+  --calc-grid-column-width: calc(var(--item-tile-height) * 3.5);
+  --grid-column-width: var(--custom-item-grid-column-width, var(--calc-grid-column-width));
+  --calc-max-product-title: calc(var(--item-tile-height) * 1.25);
+  --max-product-title: var(--custom-max-product-title, var(--calc-max-product-title));
+  --calc-product-title-text-size: calc(var(--item-tile-height) * 0.333);
+  --product-title-text-size: var(--custom-product-title-text-size, var(--calc-product-title-text-size));
+  --cutoff-background-color: var(--custom-cutoff-background-color, var(--default-cutoff-background-color));
+}
+
+body { padding-right: 0 !important; }
+
+/* Restore Vine logo, keep Amazon nav hidden */
+#nav-main { display: none; }
+#vvp-logo-link { display: inline-flex !important; }
+
+/* ------------------------------------------------------------------ */
+/* ===================== PRODUCT DETAILS SHEET ====================== */
+/* ------------------------------------------------------------------ */
+
+@media (pointer: coarse) {
+
+  /* FULL SCREEN SHEET */
+
+  /* Center top Vine navigation tabs */
+  .vvp-header-links-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center;
+    gap: 24px;
+    text-align: center;
+  }
+
+  .vvp-header-links-container a {
+    float: none !important;
+  }
+
+  .product-details-sheet {
+    position: fixed !important;
+    inset: 0 !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    z-index: 9999;
+    background-color: inherit;
+  }
+
+  .product-details-sheet__body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  #product-details-sheet-main {
+    flex: 1 1 auto;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 140px;
+  }
+
+  #product-details-sheet-footer {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    padding: 12px;
+    background: inherit;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* Button ordering */
+  #product-details-sheet-footer .a-button-discord,
+  #product-details-sheet-footer [class*="discord"] {
+    order: 1;
+  }
+
+  #product-details-sheet-back-btn { order: 2; }
+  #product-details-sheet-request-btn { order: 3; }
+
+  /* Discord icon only */
+  .a-button-discord .a-button-text { display: none; }
+}
+
+/* ------------------------------------------------------------------ */
+/* ======================= DARK MODE (SHEET) ========================= */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-color-scheme: dark) {
+
+  .product-details-sheet,
+  .product-details-sheet__body,
+  .product-details-sheet__content {
+    background-color: var(--dark-background-color) !important;
+    color: var(--dark-text-color) !important;
+  }
+
+  .product-details-sheet__title a {
+    color: #ffffff !important;
+  }
+
+  .product-details-sheet a {
+    color: var(--dark-primary-color) !important;
+  }
+
+  .product-details-sheet .a-list-item {
+    color: var(--dark-text-color) !important;
+  }
+
+  .product-details-sheet .a-expander-content-fade {
+    background: linear-gradient(
+      rgba(18,18,18,0),
+      var(--dark-background-color)
+    ) !important;
+  }
+
+  #product-details-sheet-footer {
+    background-color: #000 !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* ===================== FIX BROKEN POPOVER ========================== */
+/* ------------------------------------------------------------------ */
+
+/* Remove hard-coded popover ID dependency */
+.a-popover-modal .a-popover-wrapper {
+  height: 100dvh !important;
+  box-shadow: none;
+}
+
+.a-popover-modal .a-popover-inner {
+  max-height: 100dvh !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --------------- Review Page --------------- */
+.vvp-tab-content>* {
+  margin: 0px 0 !important;
+}
+/* Makes the pagination buttons lower */
+.a-text-center[role="navigation"] {
+  margin-top: 20px !important;
+}
+/* Makes "Awaiting Review" and "Reviewed" in the Center */
+.vvp-items-button-and-search-container {
+  align-items: center;
+}
+
+/* Editing Skyline's VineCapture Buttons */
+/* Hide the tooltips */
+.custom-tooltip {
+  display: none;
+}
+
+/* --------------- Account Page --------------- */
+/* Corrects the text display on the account page, properly fits within the boxes */
+.vvp-account-box {
+  padding: 0px !important;
+  margin-bottom: 20px;
+  border: 1px solid #d5d9d9!important;
+  height: 250px;
+}
+/* Changes the Bold Strings to Gold color */
+.vvp-account-box strong {
+  color: #e0b500 !important;
+}  
+
+/* Fixes the Account Page sizing */
+#vvp-tax-information-container div {
+  vertical-align: top;
+  width: 100% !important;
+}
+#vvp-tax-information-container .a-section {
+  display: inline-block;
+  margin-right: 0px !important;
+}   
+
+
+/* END OF: New Edits for both Light Mode and Dark Mode */
+/* #################################################################################### */
+
+
+/* Dark Mode Styles */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--dark-background-color);
+    color: var(--dark-text-color);
+    }
+
+    .a-button-primary {
+    background: var(--dark-button-background);
+    border-color: var(--dark-button-background);
+    color: var(--dark-text-color);
+    }
+
+    .a-button-primary:hover {
+    background: var(--dark-button-hover);
+    }
+
+    /* Ensuring button text color is visible in dark mode */
+    .a-button-primary .a-button-text {
+    color: var(--dark-text-color); /* Use the dark mode text color */
+    }
+
+    .vvp-header-links-container a,
+    .a-tab-heading a {
+    color: var(--dark-text-color);
+    }
+    /* Adjusting background color for .parent-node inside #vvp-browse-nodes-container */
+    #vvp-browse-nodes-container .parent-node {
+    background-color: var(--dark-background-color);
+    }
+    /* Adjusting background color for odd child divs inside #vvp-browse-nodes-container */
+    #vvp-browse-nodes-container > div:nth-child(odd) {
+    background-color: var(--dark-cutoff-background-color);
+    }
+
+    .a-link-normal:before {
+    color: var(--dark-text-color); 
+    }
+
+    /* Adjusting styles for pagination last child */
+    .a-pagination li:last-child a:before {
+    position: absolute !important;
+    color: var(--dark-text-color) !important; /* Use the dark mode text color */
+    font-size: 2rem !important;
+    line-height: 4rem;
+    height: 100%;
+    width: 100%;
+    }
+
+    /* Adjusting styles for :before pseudo-element in non-hover state */
+    #vvp-browse-nodes-container:not(:hover):before {
+    content: "Filter Categories";
+    padding: 0.5rem;
+    line-height: 3rem;
+    color: var(--dark-text-color); /* Use the dark mode text color */
+    }
+
+    /* # Changes vine header to white  */
+    ul.a-tabs .a-tab-heading a, ul.a-tabs li a {
+        color: var(--dark-text-color);
+    }
+
+/* Product Page Settings */
+    .a-popover-inner {
+        background-color: var(--dark-background-color);  
+    /* DEBUGGING CODE LINE BELOW */
+        /* background-color: blue;   */
+        padding: 1.3rem 1.6rem;
+        text-align: left;
+        overflow-x: hidden;
+    }
+    .a-popover-modal .a-popover-wrapper {
+        position: relative;
+        border-radius: 0rem;
+        border: 0rem solid;
+        border-color: #000000; /* Makes the edges of the Product Page Black */
+        box-shadow: 0;
+        height: 100%;
+    }
+    .a-box {
+        display: block;
+        border-radius: .8rem;
+        background-color:var(--dark-background-color); /* This makes the block behind the Tiles, SearchBar, RFY/AFA/AI buttons black. Change to #121212 later -- testing rn*/
+    }
+
+/* Product Details setting for Dark Mode */
+    .a-popover-modal .a-popover-header {
+    border-bottom: 1px solid #ffffff;
+    background-color: var(--dark-background-color); /* Changed this, no more border inside Product Detail page */
+    border-radius: 0rem 0rem 0 0; /* Changed this, no more border inside Product Detail page */
+    padding: 0 2.4rem;
+    }
+    /* Product Detail: changes background of "X" button to white */
+    .a-button-close {
+    background-color: white;
+    }
+    .a-button-close:focus {
+        background-color: white
+    }
+
+    /* Product Detail: changes product details to white */
+    .a-ordered-list .a-list-item,.a-unordered-list .a-list-item,ol .a-list-item,ul .a-list-item {
+        color: var(--dark-text-color);
+    }
+    .a-ordered-list.a-nostyle,.a-unordered-list.a-nostyle,ol.a-nostyle,ul.a-nostyle {
+        margin-left: 0;
+        color: var(--dark-text-color);
+    }
+    .a-unordered-list,ul {
+        margin: 0 0 0 1.8rem;
+        color: var(--dark-text-color);
+    }
+
+    /* Product Details: makes the bottom bar black */
+    .a-popover-modal .a-popover-footer {
+        border-radius: none;
+        background-color: black;
+    }
+
+    /* Product Details: makes "See More" block Gray */ 
+    .a-expander-partial-collapse-header {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: var(--dark-cutoff-background-color) !important;  
+      
+    }
+
+    /* Product Details: makes "See More" fade transprent to Gray */ 
+    .a-expander-content-fade {
+        height: 1.6rem;
+        width: 100%;
+        position: absolute;
+        top: -1.6rem;
+        left: 0;
+        background: -webkit-gradient(linear,left top,left bottom,color-stop(0,rgba(255,255,255,0)),color-stop(100%,var(--dark-cutoff-background-color)));
+    }
+
+    /* Product Details: makes drop-down buttons Gray */
+    .a-button-group-splitdropdown .a-button .a-button-inner, .a-dropdown-container .a-button-dropdown .a-button-inner {
+      border-radius: .7rem;
+      background: var(--dark-cutoff-background-color) !important;
+      box-shadow: 0 .2rem .5rem rgba(15,17,17,.15);
+    }
+
+    /* Product Details: makes drop-down text White */
+    .a-dropdown-prompt {
+      color: var(--dark-text-color) !important;
+    }
+
+    /* Product Details Drop-Down: Changes the entire popover color to black and more*/
+    .a-popover-wrapper{
+      background-color: var(--dark-background-color) !important;
+    }
+    /* Product Details Drop-Down: Changes the header color */
+    .a-dropdown .a-popover-header {
+      background-color: var(--dark-background-color) !important;
+      border-radius: .8rem .8rem 0 0;
+      padding: 0 2.4rem;
+    }
+    /* Product Details Drop-Down: Changes the selection button*/
+    .a-dropdown-common .a-dropdown-link.a-active {
+      background-color: var(--dark-button-background);
+      border-color: var(--dark-text-color);
+      border-top-color: var(--dark-text-color);
+      border-left-color: var(--dark-text-color) !important;
+    }
+    /* Product Details Drop-Down: Changes the button text color*/
+    .a-dropdown-common .a-dropdown-link {
+      color: var(--dark-text-color);
+    }
+
+/* Pagination Text Color*/
+    ul.a-pagination li a {
+      color: var(--dark-text-color);
+    }
+
+/* Reviews Page */
+    /* Changing Header color for dark mode */
+    .vvp-tab-content .vvp-reviews-table--heading-top {
+      background-color: var(--dark-cutoff-background-color) !important;
+    }
+
+/* Orders Page */
+    /* Changing Header color for dark mode */
+    .vvp-tab-content .vvp-orders-table--heading-top {
+      background-color: var(--dark-cutoff-background-color) !important;
+    }
+
+
+/* Account Page */
+  .a-box.a-color-alternate-background, .a-box.a-color-offset-background {
+    background-color: var(--dark-cutoff-background-color) !important;
+    }
+  .grey-text {
+    color: var(--dark-text-color) !important;
+  }
+}
