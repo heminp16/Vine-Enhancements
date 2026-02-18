@@ -157,32 +157,86 @@ body {
 #product-details-sheet-footer {
   box-sizing: border-box !important;
   pointer-events: auto !important;
-  position: sticky !important;
+  position: fixed !important;
+  left: 0 !important;
+  right: 0 !important;
 
   /* Raise footer higher into the sheet */
-  bottom: 120px !important;
+  bottom: calc(16px + env(safe-area-inset-bottom)) !important;
 
-  background: linear-gradient(to top, rgba(18,18,18,0.98), rgba(18,18,18,0.92)) !important;
+  background: linear-gradient(to top, rgba(18,18,18,1), rgba(18,18,18,0.96)) !important;
   backdrop-filter: blur(6px);
   display: flex !important;
-  gap: 8px;
+  gap: 10px;
+  align-items: center !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
-  padding: 12px 16px 12px 16px !important;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom)) 16px !important;
   box-shadow: 0 -6px 16px rgba(0,0,0,0.35) !important;
   z-index: 1000 !important;
 }
 
 #product-details-sheet-footer .a-button {
   width: 100% !important;
+  min-height: 54px !important;
+  height: 54px !important;
+  border-radius: 999px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+}
+
+#product-details-sheet-footer .a-button-inner,
+#product-details-sheet-footer .a-button-text {
+  height: 100% !important;
+  width: 100% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+#product-details-sheet-footer .a-button-inner {
+  padding: 0 !important;
 }
 
 #product-details-sheet-footer .a-button-discord {
   flex: 0 0 auto !important;
-  width: auto !important;
-  max-width: 56px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+  width: 54px !important;
+  max-width: 54px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  align-self: center !important;
+  margin: 0 !important;
+}
+
+#product-details-sheet-footer .a-button-discord .a-button-inner,
+#product-details-sheet-footer .a-button-discord .a-button-text {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#product-details-sheet-footer .a-button-discord .a-button-text {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+#product-details-sheet-footer .a-button-discord svg.a-button-discord-icon {
+  width: 30px !important;
+  height: 30px !important;
+  display: block !important;
+  flex: 0 0 auto !important;
+}
+
+#product-details-sheet-footer .a-button-discord .a-button-label {
+  display: none !important;
 }
 
 #product-details-sheet-back-btn,
@@ -191,15 +245,21 @@ body {
   width: 100% !important;
 }
 
+#product-details-sheet-request-btn .a-button-text {
+  white-space: nowrap !important;
+  font-size: 15px !important;
+}
+
 #product-details-sheet-main {
   padding: 16px !important;
-  padding-bottom: 220px !important; /* space for raised footer */
+  padding-bottom: 460px !important; /* space for footer + expanded content */
   box-sizing: border-box;
 }
 
 .product-details-sheet__body {
   padding-left: 0 !important;
   padding-right: 0 !important;
+  padding-bottom: 200px !important; /* keep ETV + tail content above footer */
 }
 
 .a-sheet-content-container {
@@ -207,11 +267,13 @@ body {
   overflow-x: hidden !important;
   overflow-y: hidden !important;
   width: 100% !important;
+  height: 100vh !important;
 }
 
 /* Hide scrollbar when scroll is disabled */
 .a-sheet-web-container {
   scrollbar-width: none;
+  height: 100vh !important;
 }
 .a-sheet-web-container::-webkit-scrollbar {
   display: none;
@@ -223,13 +285,38 @@ body {
   box-sizing: border-box !important;
   overflow-x: hidden !important;
   /* Pull sheet higher to show more content */
-  height: 90vh !important;
-  max-height: 90vh !important;
+  height: 100vh !important;
+  max-height: 100vh !important;
+  padding-bottom: 200px !important; /* ensure scrollable area clears footer */
+  scroll-padding-bottom: 460px !important; /* keep expanded content above footer */
 }
 
 /* Expander content should never be its own scroll container */
 .a-expander-content-expanded {
-  overflow: visible !important;
+  max-height: 40vh !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  scroll-margin-bottom: 460px !important;
+}
+
+.product-details-sheet,
+.product-details-sheet__body,
+.product-details-sheet__content {
+  min-height: 100vh !important;
+}
+
+@media (max-width: 600px) {
+  #product-details-sheet-footer .a-button-discord .a-button-text {
+    font-size: 0 !important;
+  }
+
+  #product-details-sheet-footer .a-button-discord .a-button-text::after {
+    content: "" !important;
+  }
+
+  #product-details-sheet-footer .a-button-discord .a-button-label {
+    display: none !important;
+  }
 }
 
 .a-sheet-close {
@@ -367,4 +454,325 @@ body {
 
   .vvp-mobile-category-sheet-item a,
   .vvp-mobile-child-node a { color: #e6e6e6 !important; }
+
+  /* Pagination visibility in dark mode */
+  .a-pagination a {
+    color: #f0c14b !important;
+  }
+
+  .a-pagination li {
+    color: #cfcfcf !important;
+  }
+
+  .a-pagination .a-disabled {
+    color: #7a7a7a !important;
+    opacity: 1 !important;
+  }
+
+  .a-pagination .a-disabled .larr {
+    color: #7a7a7a !important;
+  }
+
+  .a-pagination li.a-disabled,
+  .a-pagination li.a-disabled a,
+  .a-pagination li.a-disabled span {
+    color: #7a7a7a !important;
+  }
+
+  .a-pagination a .larr {
+    color: #f0c14b !important;
+  }
+
+  /* Account page dark mode */
+  #vvp-account-dashboard,
+  #vvp-account-dashboard .a-box,
+  #vvp-account-dashboard .a-box-inner {
+    background-color: #121212 !important;
+    color: #e6e6e6 !important;
+  }
+
+  #vvp-vine-account-details-box,
+  #vvp-account-dashboard .a-color-alternate-background {
+    background-color: #1a1a1a !important;
+    color: #e6e6e6 !important;
+    border-color: #2a2a2a !important;
+  }
+
+  #vvp-account-dashboard .a-color-base-background {
+    background-color: #111 !important;
+    color: #e6e6e6 !important;
+    border-color: #2a2a2a !important;
+  }
+
+  #vvp-account-dashboard .a-row,
+  #vvp-account-dashboard p,
+  #vvp-account-dashboard span,
+  #vvp-account-dashboard li,
+  #vvp-account-dashboard h4,
+  #vvp-account-dashboard h5,
+  #vvp-account-dashboard strong,
+  #vvp-account-dashboard b {
+    color: #e6e6e6 !important;
+  }
+
+  #vvp-account-dashboard a {
+    color: #f0c14b !important;
+  }
+
+  #vvp-account-dashboard .vvp-aqua,
+  #vvp-account-dashboard #vvp-evaluation-period-tooltip-trigger,
+  #vvp-account-dashboard #vvp-evaluation-period-tooltip-trigger .a-color-base {
+    color: #7fd6ff !important;
+  }
+
+  #vvp-account-dashboard .a-icon,
+  #vvp-account-dashboard .a-icon-popover,
+  #vvp-account-dashboard .a-icon-arrow-up {
+    filter: invert(1) !important;
+  }
+
+  #vvp-tax-information-container .a-button,
+  #vvp-tax-information-container .a-button-base,
+  #vvp-tax-information-container .a-button-dropdown {
+    background: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+    color: #f2f2f2 !important;
+  }
+
+  #vvp-tax-information-container .a-button-text,
+  #vvp-tax-information-container .a-dropdown-prompt {
+    color: #f2f2f2 !important;
+  }
+
+  #vvp-tax-information-container .a-button-dropdown .a-icon-dropdown {
+    filter: invert(1) !important;
+  }
+
+  #vvp-tax-information-container .a-native-dropdown {
+    background: #1f1f1f !important;
+    color: #f2f2f2 !important;
+    border-color: #3a3a3a !important;
+  }
+
+  #vvp-tax-reporting-section .a-button,
+  #vvp-tax-reporting-section .a-button-base,
+  #vvp-tax-reporting-section .a-button-dropdown {
+    background: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+    color: #f2f2f2 !important;
+  }
+
+  #vvp-tax-reporting-section .a-button-text,
+  #vvp-tax-reporting-section .a-dropdown-prompt {
+    color: #f2f2f2 !important;
+  }
+
+  #vvp-tax-reporting-section .a-button-dropdown .a-icon-dropdown {
+    filter: invert(1) !important;
+  }
+
+  #vvp-tax-year-dropdown.a-button-dropdown,
+  #vvp-tax-report-file-type-select.a-button-dropdown {
+    background: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+    color: #f2f2f2 !important;
+  }
+
+  #vvp-tax-year-dropdown.a-button-dropdown .a-button-text,
+  #vvp-tax-year-dropdown.a-button-dropdown .a-dropdown-prompt,
+  #vvp-tax-report-file-type-select.a-button-dropdown .a-button-text,
+  #vvp-tax-report-file-type-select.a-button-dropdown .a-dropdown-prompt {
+    color: #f2f2f2 !important;
+  }
+
+  #vvp-tax-year-dropdown.a-button-dropdown .a-icon-dropdown,
+  #vvp-tax-report-file-type-select.a-button-dropdown .a-icon-dropdown {
+    filter: invert(1) !important;
+  }
+
+  #vvp-tax-year-dropdown.a-button-dropdown .a-button-inner,
+  #vvp-tax-report-file-type-select.a-button-dropdown .a-button-inner {
+    background: #1f1f1f !important;
+    border-color: #3a3a3a !important;
+  }
+
+  #vvp-tax-year-dropdown.a-button-dropdown .a-button-inner .a-button-text,
+  #vvp-tax-report-file-type-select.a-button-dropdown .a-button-inner .a-button-text {
+    color: #f2f2f2 !important;
+  }
+
+  /* Dropdown popover dark mode */
+  .a-popover-wrapper,
+  .a-popover-inner,
+  .a-popover-header {
+    background: #1a1a1a !important;
+    color: #f2f2f2 !important;
+  }
+
+  .a-popover-header .a-icon-close {
+    filter: invert(1) !important;
+  }
+
+  .a-dropdown-item,
+  .a-dropdown-link {
+    color: #f2f2f2 !important;
+    background: transparent !important;
+  }
+
+  .a-dropdown-link:hover,
+  .a-dropdown-link:focus {
+    background: #2a2a2a !important;
+  }
+
+  .a-dropdown-link.a-active {
+    background: #333 !important;
+    color: #fff !important;
+  }
+
+  .contact-us {
+    background: #1a1a1a !important;
+    color: #e6e6e6 !important;
+    border-color: #2a2a2a !important;
+  }
+
+  .contact-us a {
+    color: #f0c14b !important;
+  }
+
+  .contact-us .divider {
+    color: #777 !important;
+  }
+}
+
+/* Order page: Fair market value highlight */
+.vvp-mobile-fair-market-value {
+  color: #f0c14b !important;
+  font-weight: 700 !important;
+}
+
+.vvp-mobile-fair-market-value span {
+  color: #f0c14b !important;
+}
+
+/* Mobile account layout cleanup */
+@media (max-width: 600px) {
+  .contact-us {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+  }
+
+  #vvp-account-dashboard {
+    padding: 8px 8px 24px 8px !important;
+  }
+
+  #vvp-account-dashboard .a-row,
+  #vvp-account-dashboard .a-ws-row {
+    display: block !important;
+  }
+
+  #vvp-account-dashboard .a-column,
+  #vvp-account-dashboard .a-span11,
+  #vvp-account-dashboard .a-span12,
+  #vvp-account-dashboard .a-ws-span2,
+  #vvp-account-dashboard .a-ws-span3,
+  #vvp-account-dashboard .a-ws-span4,
+  #vvp-account-dashboard .a-ws-span8,
+  #vvp-account-dashboard .a-ws-span9,
+  #vvp-account-dashboard .a-ws-span12 {
+    width: 100% !important;
+    float: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  #vvp-account-dashboard .a-scroller {
+    overflow: visible !important;
+  }
+
+  #vvp-account-dashboard .a-scroller .a-box {
+    height: auto !important;
+  }
+
+  #vvp-account-dashboard .a-scroller .a-box-inner {
+    padding: 12px !important;
+  }
+
+  #vvp-account-dashboard .metrics-display {
+    margin-bottom: 8px !important;
+  }
+}
+
+/* Account page: tax section + carousel controls */
+#vvp-tax-information-container .a-button,
+#vvp-tax-information-container .a-button-dropdown,
+#vvp-tax-information-container .a-button-base {
+  min-height: 44px !important;
+  border-radius: 10px !important;
+}
+
+#vvp-tax-information-container .a-button-text {
+  white-space: nowrap !important;
+}
+
+#vvp-tax-information-container .a-dropdown-container,
+#vvp-tax-information-container .a-button-dropdown {
+  width: 100% !important;
+}
+
+#vvp-tax-information-container .a-dropdown-container .a-button-dropdown {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+#vvp-tax-information-container .vvp-direct-child-inline-margin {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  align-items: center !important;
+}
+
+#vvp-tax-information-container .vvp-direct-child-inline-margin > * {
+  flex: 1 1 100% !important;
+}
+
+.a-carousel-row-inner {
+  align-items: center !important;
+}
+
+.a-carousel-col.a-carousel-left,
+.a-carousel-col.a-carousel-right {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.a-carousel-col.a-carousel-left .a-button,
+.a-carousel-col.a-carousel-right .a-button {
+  border-radius: 999px !important;
+}
+
+/* Carousel nav buttons visibility */
+.a-carousel-button {
+  background: #1f1f1f !important;
+  border: 1px solid #3a3a3a !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+.a-carousel-button .a-icon {
+  filter: invert(1) !important;
+}
+
+/* Opt out button: bright red glow */
+#vvp-opt-out-of-vine-button {
+  background: #ff2b2b !important;
+  border-color: #ff2b2b !important;
+  box-shadow: 0 0 12px rgba(255,43,43,0.65), 0 0 24px rgba(255,43,43,0.35) !important;
+}
+
+#vvp-opt-out-of-vine-button .a-button-text {
+  color: #fff !important;
+  font-weight: 700 !important;
 }
