@@ -799,15 +799,27 @@ body {
 #vvp-reviews-button--pending,
 #vvp-reviews-button--completed {
   flex: 1 1 0 !important;
+  min-width: 0 !important;
   border-radius: 16px !important;
+}
+
+#vvp-reviews-button--pending .a-button-inner,
+#vvp-reviews-button--pending .a-button-text,
+#vvp-reviews-button--completed .a-button-inner,
+#vvp-reviews-button--completed .a-button-text {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
 }
 
 #vvp-reviews-button--pending .a-button-text,
 #vvp-reviews-button--completed .a-button-text {
+  font-weight: 800 !important;
+  font-size: 16px !important;
+  padding: 16px 0 !important;
+  letter-spacing: 0.5px !important;
   text-align: center !important;
-  font-weight: 700 !important;
-  padding: 12px 0 !important;
-  display: block !important;
 }
 
 
