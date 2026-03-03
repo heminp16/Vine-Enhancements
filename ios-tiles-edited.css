@@ -128,6 +128,14 @@ body {
   margin-left: 0;
 }
 
+@media screen and (max-width: 768px) {
+  .vvp-items-button-and-search-container {
+    margin-top: -5px;
+    margin-bottom: 0;
+    margin-left: -17px;
+  }
+}
+
 .vvp-container-search {
   display: flex !important;
   align-items: center;
@@ -482,6 +490,14 @@ body {
   }
 
   /* Pagination */
+  .a-pagination,
+  .a-pagination ul,
+  .a-pagination li,
+  .a-pagination li a,
+  .a-pagination li span {
+    background-color: transparent !important;
+  }
+
   .a-pagination a { color: #f0c14b !important; }
   .a-pagination li { color: #cfcfcf !important; }
 
@@ -771,10 +787,16 @@ body {
    ========================= */
 
 /* Thumbnail images in table rows */
-.vvp-orders-table--image-col img,
+.vvp-orders-table--image-col img {
+  width: 72px !important;
+  height: 72px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
 .vvp-reviews-table--image-col img {
-  width: 56px !important;
-  height: 56px !important;
+  width: 72px !important;
+  height: 72px !important;
   object-fit: contain !important;
   display: block !important;
 }
@@ -783,6 +805,11 @@ body {
 .vvp-orders-table--action-btn .a-button-text,
 .vvp-reviews-table--action-btn .a-button-text {
   white-space: nowrap !important;
+}
+
+/* Force order date onto its own line below the "Order date:" label */
+.vvp-order-date {
+  display: block !important;
 }
 
 
@@ -796,30 +823,42 @@ body {
   margin-bottom: 12px !important;
 }
 
+/* Outer button is a flex container so .a-button-inner can stretch to full height */
 #vvp-reviews-button--pending,
 #vvp-reviews-button--completed {
   flex: 1 1 0 !important;
   min-width: 0 !important;
   border-radius: 16px !important;
+  display: flex !important;
+  align-items: stretch !important;
 }
 
+/* flex: 1 makes it fill the button height; then it centers its own content */
 #vvp-reviews-button--pending .a-button-inner,
-#vvp-reviews-button--pending .a-button-text,
-#vvp-reviews-button--completed .a-button-inner,
-#vvp-reviews-button--completed .a-button-text {
+#vvp-reviews-button--completed .a-button-inner {
+  flex: 1 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 100% !important;
 }
 
 #vvp-reviews-button--pending .a-button-text,
 #vvp-reviews-button--completed .a-button-text {
+  display: block !important;
+  width: 100% !important;
   font-weight: 800 !important;
   font-size: 16px !important;
-  padding: 16px 0 !important;
+  padding: 5px 40px !important;
   letter-spacing: 0.5px !important;
   text-align: center !important;
+}
+
+/* Rename "Awaiting Review" → "Awaiting" so both buttons are single-line */
+#vvp-reviews-button--pending .a-button-text { font-size: 0 !important; }
+#vvp-reviews-button--pending .a-button-text::after {
+  content: "Awaiting";
+  font-size: 16px;
+  font-weight: 800;
 }
 
 
@@ -835,11 +874,15 @@ body {
 
 .status-bar {
   display: flex !important;
+  align-items: center !important;
   gap: 4px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .status-bar .segment {
-  flex: 1 !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
   height: 8px !important;
   border-radius: 4px !important;
 }
@@ -953,5 +996,17 @@ body {
   .status-bar.good .segment      { background-color: #8bc34a !important; }
   .status-bar.fair .segment      { background-color: #ff9800 !important; }
   .status-bar.poor .segment      { background-color: #f44336 !important; }
+
+  /* Review quality score badges — classes injected by vine-review-scores.user.js */
+  .vvp-review-score {
+    font-weight: 700 !important;
+    display: inline-block !important;
+  }
+
+  .vvp-review-score--excellent { color: #4caf50 !important; }
+  .vvp-review-score--good      { color: #8bc34a !important; }
+  .vvp-review-score--fair      { color: #ff9800 !important; }
+  .vvp-review-score--poor      { color: #f44336 !important; }
+  .vvp-review-score--pending   { color: #9e9e9e !important; font-style: italic !important; }
 
 }
