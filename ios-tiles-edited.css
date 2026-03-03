@@ -764,3 +764,213 @@ body {
   color: #fff !important;
   font-weight: 700 !important;
 }
+
+
+/* =========================
+   ORDERS + REVIEWS TABLES (STRUCTURE)
+   ========================= */
+
+.vvp-orders-table,
+.vvp-reviews-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+}
+
+/* Thumbnail images in table rows */
+.vvp-orders-table--image-col img,
+.vvp-reviews-table--image-col img {
+  width: 56px !important;
+  height: 56px !important;
+  object-fit: contain !important;
+  display: block !important;
+}
+
+/* Comfortable cell padding */
+.vvp-orders-table td,
+.vvp-orders-table th,
+.vvp-reviews-table td,
+.vvp-reviews-table th {
+  padding: 10px 8px !important;
+  vertical-align: middle !important;
+}
+
+/* Action buttons */
+.vvp-orders-table--action-btn,
+.vvp-reviews-table--action-btn {
+  border-radius: 8px !important;
+  white-space: nowrap !important;
+}
+
+.vvp-orders-table--action-btn .a-button-text,
+.vvp-reviews-table--action-btn .a-button-text {
+  white-space: nowrap !important;
+}
+
+
+/* =========================
+   REVIEWS PAGE (STRUCTURE)
+   ========================= */
+
+#vvp-review-button-container {
+  display: flex !important;
+  gap: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+#vvp-reviews-button--pending,
+#vvp-reviews-button--completed {
+  flex: 1 1 0 !important;
+  border-radius: 16px !important;
+}
+
+#vvp-reviews-button--pending .a-button-text,
+#vvp-reviews-button--completed .a-button-text {
+  text-align: center !important;
+  font-weight: 700 !important;
+  padding: 12px 0 !important;
+  display: block !important;
+}
+
+
+/* =========================
+   ACCOUNT PROGRESS BARS (STRUCTURE)
+   ========================= */
+
+.animated-progress-bar {
+  border-radius: 999px !important;
+  overflow: hidden !important;
+  height: 8px !important;
+}
+
+.status-bar {
+  display: flex !important;
+  gap: 4px !important;
+}
+
+.status-bar .segment {
+  flex: 1 !important;
+  height: 8px !important;
+  border-radius: 4px !important;
+}
+
+
+/* =========================
+   ORDERS + REVIEWS DARK MODE
+   ========================= */
+
+@media (prefers-color-scheme: dark) {
+
+  /* Table chrome */
+  .vvp-orders-table,
+  .vvp-reviews-table {
+    background-color: #121212 !important;
+    color: #e6e6e6 !important;
+  }
+
+  /* Column headings */
+  .vvp-orders-table--heading-row th,
+  .vvp-reviews-table--heading-row th {
+    background-color: #1a1a1a !important;
+    color: #aaaaaa !important;
+    border-bottom: 1px solid #2a2a2a !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+  }
+
+  /* Heading labels above table (e.g. "Orders (843)") */
+  .vvp-orders-table--heading-top h3,
+  .vvp-reviews-table--heading-top h3 {
+    color: #e6e6e6 !important;
+  }
+
+  /* Row separators */
+  .vvp-orders-table--row,
+  .vvp-reviews-table--row {
+    border-bottom: 1px solid #222 !important;
+  }
+
+  /* Alternating row backgrounds */
+  .vvp-orders-table--row:nth-child(odd),
+  .vvp-reviews-table--row:nth-child(odd) {
+    background-color: #161616 !important;
+  }
+
+  .vvp-orders-table--row:nth-child(even),
+  .vvp-reviews-table--row:nth-child(even) {
+    background-color: #1c1c1c !important;
+  }
+
+  /* Cell text + product title links */
+  .vvp-orders-table--text-col,
+  .vvp-reviews-table--text-col {
+    color: #d0d0d0 !important;
+  }
+
+  .vvp-orders-table--text-col .a-link-normal,
+  .vvp-reviews-table--text-col .a-link-normal {
+    color: #f0c14b !important;
+    text-decoration: none !important;
+  }
+
+  /* "Order details" button (base/grey) */
+  .vvp-orders-table--action-btn.a-button-base {
+    background: #e0e0e0 !important;
+    border-color: #bdbdbd !important;
+  }
+
+  .vvp-orders-table--action-btn .a-button-text {
+    color: #111 !important;
+  }
+
+  /* "Review item" button (primary/yellow) */
+  .vvp-reviews-table--action-btn.a-button-primary {
+    background: #f0c14b !important;
+    border-color: #a88734 !important;
+  }
+
+  .vvp-reviews-table--action-btn .a-button-text {
+    color: #111 !important;
+  }
+
+  /* Review tab buttons (Awaiting Review / Reviewed) */
+  #vvp-reviews-button--pending,
+  #vvp-reviews-button--completed {
+    background: #e0e0e0 !important;
+    border-color: #bdbdbd !important;
+  }
+
+  #vvp-reviews-button--pending.a-button-selected,
+  #vvp-reviews-button--completed.a-button-selected {
+    background: #ffffff !important;
+    box-shadow: inset 0 0 0 2px #2874f0;
+  }
+
+  #vvp-reviews-button--pending .a-button-text,
+  #vvp-reviews-button--completed .a-button-text {
+    color: #111 !important;
+  }
+
+  /* Account animated progress bar */
+  .animated-progress-bar {
+    background-color: #2a2a2a !important;
+  }
+
+  .animated-progress-bar span {
+    display: block !important;
+    height: 100% !important;
+    background: #f0c14b !important;
+    border-radius: 999px !important;
+  }
+
+  /* Status bar tiers — segments light up based on tier class on parent */
+  .status-bar .segment {
+    background-color: #2a2a2a !important;
+  }
+
+  .status-bar.excellent .segment { background-color: #4caf50 !important; }
+  .status-bar.good .segment      { background-color: #8bc34a !important; }
+  .status-bar.fair .segment      { background-color: #ff9800 !important; }
+  .status-bar.poor .segment      { background-color: #f44336 !important; }
+
+}
