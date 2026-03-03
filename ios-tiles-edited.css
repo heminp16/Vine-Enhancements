@@ -770,12 +770,6 @@ body {
    ORDERS + REVIEWS TABLES (STRUCTURE)
    ========================= */
 
-.vvp-orders-table,
-.vvp-reviews-table {
-  width: 100% !important;
-  border-collapse: collapse !important;
-}
-
 /* Thumbnail images in table rows */
 .vvp-orders-table--image-col img,
 .vvp-reviews-table--image-col img {
@@ -785,22 +779,7 @@ body {
   display: block !important;
 }
 
-/* Comfortable cell padding */
-.vvp-orders-table td,
-.vvp-orders-table th,
-.vvp-reviews-table td,
-.vvp-reviews-table th {
-  padding: 10px 8px !important;
-  vertical-align: middle !important;
-}
-
 /* Action buttons */
-.vvp-orders-table--action-btn,
-.vvp-reviews-table--action-btn {
-  border-radius: 8px !important;
-  white-space: nowrap !important;
-}
-
 .vvp-orders-table--action-btn .a-button-text,
 .vvp-reviews-table--action-btn .a-button-text {
   white-space: nowrap !important;
@@ -890,26 +869,16 @@ body {
     border-bottom: 1px solid #222 !important;
   }
 
-  /* Alternating row backgrounds */
-  .vvp-orders-table--row:nth-child(odd),
-  .vvp-reviews-table--row:nth-child(odd) {
-    background-color: #161616 !important;
-  }
-
-  .vvp-orders-table--row:nth-child(even),
-  .vvp-reviews-table--row:nth-child(even) {
-    background-color: #1c1c1c !important;
-  }
-
-  /* Cell text + product title links */
+  /* Cell text */
   .vvp-orders-table--text-col,
   .vvp-reviews-table--text-col {
     color: #d0d0d0 !important;
   }
 
+  /* Product title links — white, not yellow (yellow is reserved for action buttons) */
   .vvp-orders-table--text-col .a-link-normal,
   .vvp-reviews-table--text-col .a-link-normal {
-    color: #f0c14b !important;
+    color: #e0e0e0 !important;
     text-decoration: none !important;
   }
 
