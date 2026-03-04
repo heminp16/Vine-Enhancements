@@ -132,7 +132,6 @@ body {
   .vvp-items-button-and-search-container {
     margin-top: -5px;
     margin-bottom: 0;
-    margin-left: -17px;
   }
 }
 
@@ -821,6 +820,7 @@ body {
   display: flex !important;
   gap: 8px !important;
   margin-bottom: 12px !important;
+  margin-left: 15px !important;
 }
 
 /* Outer button is a flex container so .a-button-inner can stretch to full height */
@@ -997,16 +997,22 @@ body {
   .status-bar.fair .segment      { background-color: #ff9800 !important; }
   .status-bar.poor .segment      { background-color: #f44336 !important; }
 
-  /* Review quality score badges — classes injected by vine-review-scores.user.js */
-  .vvp-review-score {
-    font-weight: 700 !important;
-    display: inline-block !important;
-  }
-
-  .vvp-review-score--excellent { color: #4caf50 !important; }
-  .vvp-review-score--good      { color: #8bc34a !important; }
-  .vvp-review-score--fair      { color: #ff9800 !important; }
-  .vvp-review-score--poor      { color: #f44336 !important; }
-  .vvp-review-score--pending   { color: #9e9e9e !important; font-style: italic !important; }
-
 }
+
+
+/* =========================
+   REVIEW QUALITY SCORES
+   Always-on (page is always dark regardless of OS preference)
+   Classes injected by ingest_ios_vine_css.user.js
+   ========================= */
+
+.vvp-review-score {
+  font-weight: 700 !important;
+  display: block !important;
+}
+
+.vvp-review-score--excellent { color: #4caf50 !important; }
+.vvp-review-score--good      { color: #8bc34a !important; }
+.vvp-review-score--fair      { color: #ff9800 !important; }
+.vvp-review-score--poor      { color: #f44336 !important; }
+.vvp-review-score--pending   { color: #9e9e9e !important; font-style: italic !important; }

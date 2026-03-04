@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.2.0
+// @version      2.3.0
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -316,6 +316,13 @@ NOTES:
         e?.preventDefault();
         e?.stopPropagation();
 
+        if (!API_TOKEN) {
+            const token = window.prompt('Enter your Brenda API token:');
+            if (!token) return;
+            saveSettings('apiToken', token);
+            API_TOKEN = token;
+        }
+
         const data = extractProductData();
         if (!data || !data.asin || !data.queue) {
             console.warn('[VDP] Missing product state', {
@@ -325,8 +332,20 @@ NOTES:
             return;
         }
 
-        console.log('[VDP] Posting', data);
-        await sendDataToAPI(data);
+        if (shareButtonElem) {
+            shareButtonElem.style.pointerEvents = 'none';
+            shareButtonElem.style.opacity = '0.5';
+        }
+
+        try {
+            console.log('[VDP] Posting', data);
+            await sendDataToAPI(data);
+        } finally {
+            if (shareButtonElem) {
+                shareButtonElem.style.pointerEvents = '';
+                shareButtonElem.style.opacity = '';
+            }
+        }
     }
 
 
