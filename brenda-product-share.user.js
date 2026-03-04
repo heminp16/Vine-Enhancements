@@ -337,11 +337,25 @@ NOTES:
             shareButtonElem.style.opacity = '0.5';
         }
 
+        let posted = false;
         try {
             console.log('[VDP] Posting', data);
-            await sendDataToAPI(data);
+            const xhr = await sendDataToAPI(data);
+            if (xhr.status === 401) {
+                saveSettings('apiToken', null);
+                API_TOKEN = null;
+                const token = window.prompt('Invalid token. Enter a new Brenda API token:');
+                if (token) {
+                    saveSettings('apiToken', token);
+                    API_TOKEN = token;
+                }
+            } else if (xhr.status >= 200 && xhr.status < 300) {
+                posted = true;
+                const label = shareButtonElem?.querySelector('.a-button-label');
+                if (label) label.textContent = 'Posted ✓';
+            }
         } finally {
-            if (shareButtonElem) {
+            if (!posted && shareButtonElem) {
                 shareButtonElem.style.pointerEvents = '';
                 shareButtonElem.style.opacity = '';
             }
