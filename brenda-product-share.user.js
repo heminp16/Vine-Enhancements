@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.3.4
+// @version      2.3.5
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -87,6 +87,9 @@ NOTES:
 
     let shareButtonElem = null;
     let currentProductKey = null;
+    let historyCache = null;
+    let renderedButton = null;
+    let renderedState = null;
     const postingProducts = new Set();
 
     //  Utilities
@@ -273,16 +276,22 @@ NOTES:
     });
 
     //  Share Button Injection  
-    function getHistory() {
+    function getHistory(refresh = false) {
+        if (historyCache && !refresh) return historyCache;
         try {
-            return JSON.parse(localStorage.getItem('VDP_HISTORY')) || {};
+            const history = JSON.parse(localStorage.getItem('VDP_HISTORY'));
+            historyCache = history && typeof history === 'object' && !Array.isArray(history)
+                ? history
+                : {};
         } catch (_) {
-            return {};
+            historyCache = {};
         }
+        return historyCache;
     }
 
     function saveHistory(history) {
         localStorage.setItem('VDP_HISTORY', JSON.stringify(history));
+        historyCache = history;
     }
 
     function pruneHistory(history) {
@@ -302,7 +311,7 @@ NOTES:
 
     function markProductPosted(key) {
         if (!key) return;
-        const history = pruneHistory(getHistory());
+        const history = pruneHistory(getHistory(true));
         history[key] = { postedAt: Date.now() };
         saveHistory(history);
     }
@@ -315,6 +324,9 @@ NOTES:
 
     function setShareButtonState(state) {
         if (!shareButtonElem) return;
+        if (renderedButton === shareButtonElem && renderedState === state) return;
+        renderedButton = shareButtonElem;
+        renderedState = state;
 
         const label = shareButtonElem.querySelector('.a-button-label');
         const input = shareButtonElem.querySelector('.a-button-input');
@@ -445,12 +457,9 @@ NOTES:
 
         return new Promise((resolve) => {
             const xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    resolve(xhr);
-                }
-            };
+            xhr.onloadend = () => resolve(xhr);
             xhr.open('PUT', 'https://api.llamastories.com/brenda/product', true);
+            xhr.timeout = 20000;
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.send(params);
         });
@@ -544,6 +553,7 @@ NOTES:
     }
 
     const observer = new MutationObserver((records) => {
+        if (shareUpdatePending) return;
         const hasProductChange = records.some((record) => {
             const element = record.target.nodeType === 1
                 ? record.target
@@ -556,6 +566,13 @@ NOTES:
             );
         });
         if (hasProductChange) scheduleShareUpdate();
+    });
+
+    window.addEventListener('storage', (event) => {
+        if (event.key === 'VDP_HISTORY' || event.key === null) {
+            historyCache = null;
+            scheduleShareUpdate();
+        }
     });
 
     observer.observe(document.body, {

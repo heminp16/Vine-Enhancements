@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ingest Vine CSS for Amazon Vine Pages
 // @namespace    https://github.com/heminp16
-// @version      1.2
+// @version      1.3
 // @description  Injects custom Vine CSS from GitHub and applies review score color-coding.
 // @author       skyline
 // @match        https://www.amazon.com/vine/*
@@ -41,43 +41,57 @@
         'pending':   'vvp-review-score--pending',
     };
 
-    function colorizeScores() {
-        document.querySelectorAll('.vvp-reviews-table--text-col div').forEach(div => {
+    const scoreCellSelector = '.vvp-reviews-table--text-col';
+
+    function colorizeScores(cell) {
+        cell.querySelectorAll('div').forEach(div => {
             if (!div.textContent.includes('Review quality score')) return;
             const span = div.querySelector('span');
-            if (!span || span.dataset.scoreColored) return;
+            if (!span) return;
 
             const val = span.textContent.trim().toLowerCase();
+            if (span.dataset.scoreColored === val) return;
             span.classList.add('vvp-review-score');
-            const cls = SCORE_MAP[val];
-            if (cls) span.classList.add(cls);
-            span.dataset.scoreColored = '1';
+            Object.entries(SCORE_MAP).forEach(([score, cls]) => {
+                span.classList.toggle(cls, score === val);
+            });
+            span.dataset.scoreColored = val;
         });
     }
 
     let scoreUpdatePending = false;
+    const pendingScoreCells = new Set();
     function scheduleScoreUpdate() {
         if (scoreUpdatePending) return;
         scoreUpdatePending = true;
         requestAnimationFrame(() => {
             scoreUpdatePending = false;
-            colorizeScores();
+            const cells = Array.from(pendingScoreCells);
+            pendingScoreCells.clear();
+            cells.forEach(cell => {
+                if (cell.isConnected) colorizeScores(cell);
+            });
         });
     }
 
-    colorizeScores();
+    document.querySelectorAll(scoreCellSelector).forEach(colorizeScores);
     new MutationObserver((records) => {
-        const selector = '.vvp-reviews-table--text-col';
-        const hasScoreChange = records.some((record) => {
+        records.forEach((record) => {
             const element = record.target.nodeType === 1
                 ? record.target
                 : record.target.parentElement;
-            if (element?.closest(selector)) return true;
-            return Array.from(record.addedNodes).some((node) =>
-                node.nodeType === 1 && (node.matches(selector) || node.querySelector(selector))
-            );
+            const cell = element?.closest(scoreCellSelector);
+            if (cell) {
+                pendingScoreCells.add(cell);
+                return;
+            }
+            record.addedNodes.forEach(node => {
+                if (node.nodeType !== 1) return;
+                if (node.matches(scoreCellSelector)) pendingScoreCells.add(node);
+                node.querySelectorAll(scoreCellSelector).forEach(cell => pendingScoreCells.add(cell));
+            });
         });
-        if (hasScoreChange) scheduleScoreUpdate();
+        if (pendingScoreCells.size) scheduleScoreUpdate();
     }).observe(document.body, {
         childList: true,
         subtree: true,

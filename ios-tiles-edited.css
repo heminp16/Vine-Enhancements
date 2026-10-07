@@ -210,9 +210,7 @@ body {
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  background: linear-gradient(to top, rgba(18,18,18,1), rgba(18,18,18,0.96)) !important;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: #121212 !important;
   display: flex !important;
   gap: 10px;
   align-items: center !important;
