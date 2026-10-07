@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ingest Vine CSS for Amazon Vine Pages
 // @namespace    https://github.com/heminp16
-// @version      1.1
+// @version      1.2
 // @description  Injects custom Vine CSS from GitHub and applies review score color-coding.
 // @author       skyline
 // @match        https://www.amazon.com/vine/*
@@ -31,6 +31,8 @@
     });
 
     // Color-code review quality scores on the reviews page
+    if (!location.pathname.startsWith('/vine/vine-reviews')) return;
+
     const SCORE_MAP = {
         'excellent': 'vvp-review-score--excellent',
         'good':      'vvp-review-score--good',
@@ -53,10 +55,33 @@
         });
     }
 
+    let scoreUpdatePending = false;
+    function scheduleScoreUpdate() {
+        if (scoreUpdatePending) return;
+        scoreUpdatePending = true;
+        requestAnimationFrame(() => {
+            scoreUpdatePending = false;
+            colorizeScores();
+        });
+    }
+
     colorizeScores();
-    new MutationObserver(colorizeScores).observe(document.body, {
+    new MutationObserver((records) => {
+        const selector = '.vvp-reviews-table--text-col';
+        const hasScoreChange = records.some((record) => {
+            const element = record.target.nodeType === 1
+                ? record.target
+                : record.target.parentElement;
+            if (element?.closest(selector)) return true;
+            return Array.from(record.addedNodes).some((node) =>
+                node.nodeType === 1 && (node.matches(selector) || node.querySelector(selector))
+            );
+        });
+        if (hasScoreChange) scheduleScoreUpdate();
+    }).observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
+        characterData: true
     });
 
 })();

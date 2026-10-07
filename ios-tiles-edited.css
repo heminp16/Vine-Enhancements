@@ -206,7 +206,6 @@ body {
 
 #product-details-sheet-footer {
   box-sizing: border-box !important;
-  pointer-events: auto !important;
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
@@ -245,6 +244,15 @@ body {
 
 #product-details-sheet-footer .a-button-inner {
   padding: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+#product-details-sheet-footer .a-button-input {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 #product-details-sheet-footer .a-button-discord {

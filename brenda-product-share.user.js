@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.3.3
+// @version      2.3.4
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -86,7 +86,6 @@ NOTES:
     let recommendationId = null;
 
     let shareButtonElem = null;
-    let productContainer = null;
     let currentProductKey = null;
     const postingProducts = new Set();
 
@@ -108,8 +107,16 @@ NOTES:
             justify-content: center !important;
         }
 
-        .a-button-discord.mobile-vertical {
-            margin-top: 8px;
+        .a-button-discord .a-button-inner {
+            position: relative !important;
+            overflow: hidden !important;
+        }
+
+        .a-button-discord .a-button-input {
+            position: absolute !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
         }
 
         /* Layout the icon + label correctly */
@@ -249,6 +256,8 @@ NOTES:
             queueType = hashes === 3 ? 'potluck' : 'encore';
         }
 
+        scheduleShareUpdate();
+
         const tile = btn.closest('.vvp-item-tile-content');
         if (!tile) return;
 
@@ -300,9 +309,8 @@ NOTES:
 
     function productWasPosted(key) {
         if (!key) return false;
-        const history = pruneHistory(getHistory());
-        saveHistory(history);
-        return Boolean(history[key]);
+        const entry = getHistory()[key];
+        return Boolean(entry?.postedAt && entry.postedAt >= Date.now() - ITEM_EXPIRY);
     }
 
     function setShareButtonState(state) {
@@ -341,8 +349,9 @@ NOTES:
     }
 
     function syncShareButtonState() {
-        const data = extractProductData();
-        currentProductKey = getProductKey(data);
+        const titleElem = getTitleElement();
+        const asin = titleElem?.href?.match(/\/dp\/([A-Z0-9]+)/)?.[1] || parentAsin;
+        currentProductKey = getProductKey({ asin, queue: queueType });
 
         if (!currentProductKey) {
             setShareButtonState('ready');
@@ -362,8 +371,7 @@ NOTES:
         const modal = getFooterAndContainer();
         if (!modal) return;
 
-        const [footer, container] = modal;
-        productContainer = container;
+        const [footer] = modal;
 
         shareButtonElem = footer.querySelector('.a-button-discord');
         if (shareButtonElem) {
@@ -396,18 +404,6 @@ NOTES:
         shareButtonElem.addEventListener('click', buttonHandler);
         syncShareButtonState();
 
-        new ResizeObserver(updateButtonPosition).observe(container);
-    }
-
-
-    function updateButtonPosition() {
-        if (!shareButtonElem || !productContainer) return;
-
-        if (productContainer.offsetWidth < productContainer.offsetHeight) {
-            shareButtonElem.classList.add('mobile-vertical');
-        } else {
-            shareButtonElem.classList.remove('mobile-vertical');
-        }
     }
 
     //  Product Data Extraction 
@@ -423,8 +419,8 @@ NOTES:
               qs('#vvp-product-details-modal--hero-image');
 
         const etv =
-              qs('#product-details-sheet-tax-value-string')?.innerText ||
-              qs('#vvp-product-details-modal--tax-value-string')?.innerText;
+              qs('#product-details-sheet-tax-value-string')?.textContent ||
+              qs('#vvp-product-details-modal--tax-value-string')?.textContent;
 
         return {
             asin,
@@ -534,22 +530,42 @@ NOTES:
 
 
     //  Observer
+    const productSelectors = '#product-details-sheet-title, #product-details-sheet-footer, ' +
+        '#vvp-product-details-modal--product-title, .vvp-modal-footer';
+    let shareUpdatePending = false;
+
+    function scheduleShareUpdate() {
+        if (shareUpdatePending) return;
+        shareUpdatePending = true;
+        requestAnimationFrame(() => {
+            shareUpdatePending = false;
+            if (getTitleElement()) addShareButton();
+        });
+    }
+
     const observer = new MutationObserver((records) => {
-        const hasExternalChange = records.some((record) => {
+        const hasProductChange = records.some((record) => {
             const element = record.target.nodeType === 1
                 ? record.target
                 : record.target.parentElement;
-            return !element?.closest('.a-button-discord');
+            if (element?.closest('.a-button-discord')) return false;
+            if (element?.closest(productSelectors)) return true;
+            return Array.from(record.addedNodes).some((node) =>
+                node.nodeType === 1 &&
+                (node.matches(productSelectors) || node.querySelector(productSelectors))
+            );
         });
-        if (!hasExternalChange) return;
-        if (getTitleElement()) {
-            addShareButton();
-        }
+        if (hasProductChange) scheduleShareUpdate();
     });
 
     observer.observe(document.body, {
         childList: true,
-        subtree: true
+        subtree: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: ['href']
     });
+
+    scheduleShareUpdate();
 
 })();
