@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.3.0
+// @version      2.3.1
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -87,6 +87,8 @@ NOTES:
 
     let shareButtonElem = null;
     let productContainer = null;
+    let currentProductKey = null;
+    const postingProducts = new Set();
 
     //  Utilities
     function qs(sel) {
@@ -101,8 +103,9 @@ NOTES:
 
     addGlobalStyle(`
         .a-button-discord {
-            display: inline-flex;
-            align-items: center;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
 
         .a-button-discord.mobile-vertical {
@@ -110,9 +113,11 @@ NOTES:
         }
 
         /* Layout the icon + label correctly */
+        .a-button-discord .a-button-inner,
         .a-button-discord .a-button-text {
-            display: inline-flex;
-            align-items: center;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             gap: 6px;
             line-height: 1;
         }
@@ -125,7 +130,7 @@ NOTES:
             min-height: 18px;
             max-width: 18px;
             max-height: 18px;
-            display: inline-block;
+            display: inline-block !important;
             flex: 0 0 auto;
             vertical-align: middle;
         }
@@ -134,6 +139,11 @@ NOTES:
         .a-button-discord .a-button-label {
             display: inline;
             white-space: nowrap;
+        }
+
+        .a-button-discord.is-disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         /* Mobile: icon-only */
@@ -215,14 +225,109 @@ NOTES:
     });
 
     //  Share Button Injection  
-    function addShareButton() {
-        if (qs('.a-button-discord')) return;
+    function getHistory() {
+        try {
+            return JSON.parse(localStorage.getItem('VDP_HISTORY')) || {};
+        } catch (_) {
+            return {};
+        }
+    }
 
+    function saveHistory(history) {
+        localStorage.setItem('VDP_HISTORY', JSON.stringify(history));
+    }
+
+    function pruneHistory(history) {
+        const cutoff = Date.now() - ITEM_EXPIRY;
+        Object.entries(history).forEach(([key, value]) => {
+            if (!value?.postedAt || value.postedAt < cutoff) {
+                delete history[key];
+            }
+        });
+        return history;
+    }
+
+    function getProductKey(data) {
+        if (!data?.asin) return null;
+        return [urlData?.[1] || location.hostname, data.queue || 'unknown', data.asin].join(':');
+    }
+
+    function markProductPosted(key) {
+        if (!key) return;
+        const history = pruneHistory(getHistory());
+        history[key] = { postedAt: Date.now() };
+        saveHistory(history);
+    }
+
+    function productWasPosted(key) {
+        if (!key) return false;
+        const history = pruneHistory(getHistory());
+        saveHistory(history);
+        return Boolean(history[key]);
+    }
+
+    function setShareButtonState(state) {
+        if (!shareButtonElem) return;
+
+        const label = shareButtonElem.querySelector('.a-button-label');
+        const input = shareButtonElem.querySelector('.a-button-input');
+        const isDisabled = state === 'posting' || state === 'posted';
+
+        shareButtonElem.classList.toggle('is-disabled', isDisabled);
+        shareButtonElem.setAttribute('aria-disabled', String(isDisabled));
+        shareButtonElem.title =
+            state === 'posted'
+                ? 'Already shared to Discord'
+                : state === 'posting'
+                    ? 'Posting to Discord...'
+                    : state === 'failed'
+                        ? 'Could not post. Tap to retry.'
+                        : 'Share on Discord';
+
+        if (input) input.disabled = isDisabled;
+        if (label) {
+            label.textContent =
+                state === 'posted'
+                    ? 'Posted'
+                    : state === 'posting'
+                        ? 'Posting...'
+                        : state === 'failed'
+                            ? 'Try Again'
+                            : 'Share on Discord';
+        }
+    }
+
+    function syncShareButtonState() {
+        const data = extractProductData();
+        currentProductKey = getProductKey(data);
+
+        if (!currentProductKey) {
+            setShareButtonState('ready');
+            return;
+        }
+
+        if (postingProducts.has(currentProductKey)) {
+            setShareButtonState('posting');
+        } else if (productWasPosted(currentProductKey)) {
+            setShareButtonState('posted');
+        } else {
+            setShareButtonState('ready');
+        }
+    }
+
+    function addShareButton() {
         const modal = getFooterAndContainer();
         if (!modal) return;
 
         const [footer, container] = modal;
         productContainer = container;
+
+        shareButtonElem = footer.querySelector('.a-button-discord');
+        if (shareButtonElem) {
+            syncShareButtonState();
+            return;
+        }
+
 
         footer.insertAdjacentHTML(
             'afterbegin',
@@ -244,8 +349,9 @@ NOTES:
             `
         );
 
-        shareButtonElem = qs('.a-button-discord');
+        shareButtonElem = footer.querySelector('.a-button-discord');
         shareButtonElem.addEventListener('click', buttonHandler);
+        syncShareButtonState();
 
         new ResizeObserver(updateButtonPosition).observe(container);
     }
@@ -267,7 +373,7 @@ NOTES:
         if (!titleElem) return null;
 
         const asin =
-              titleElem.href.match(/\/dp\/([A-Z0-9]+)/)?.[1] || parentAsin;
+              titleElem.href?.match(/\/dp\/([A-Z0-9]+)/)?.[1] || parentAsin;
 
         const imageElem =
               qs('#product-details-sheet-image') ||
@@ -290,7 +396,7 @@ NOTES:
         const params = new URLSearchParams({
             version: 2,
             token: API_TOKEN,
-            domain: urlData[1],
+            domain: urlData?.[1] || location.hostname,
             tab: data.queue,
             asin: data.asin,
             etv: data.etv,
@@ -332,12 +438,24 @@ NOTES:
             return;
         }
 
-        if (shareButtonElem) {
-            shareButtonElem.style.pointerEvents = 'none';
-            shareButtonElem.style.opacity = '0.5';
+        const productKey = getProductKey(data);
+        if (!productKey) {
+            console.warn('[VDP] Missing product key', data);
+            return;
         }
 
+        if (postingProducts.has(productKey) || productWasPosted(productKey)) {
+            currentProductKey = productKey;
+            syncShareButtonState();
+            return;
+        }
+
+        postingProducts.add(productKey);
+        currentProductKey = productKey;
+        setShareButtonState('posting');
+
         let posted = false;
+        let keepVisibleFailure = false;
         try {
             console.log('[VDP] Posting', data);
             const xhr = await sendDataToAPI(data);
@@ -351,13 +469,20 @@ NOTES:
                 }
             } else if (xhr.status >= 200 && xhr.status < 300) {
                 posted = true;
-                const label = shareButtonElem?.querySelector('.a-button-label');
-                if (label) label.textContent = 'Posted ✓';
+                markProductPosted(productKey);
+                setShareButtonState('posted');
+            } else {
+                setShareButtonState('failed');
+                keepVisibleFailure = true;
+                console.warn('[VDP] Post failed', {
+                    status: xhr.status,
+                    response: xhr.responseText
+                });
             }
         } finally {
-            if (!posted && shareButtonElem) {
-                shareButtonElem.style.pointerEvents = '';
-                shareButtonElem.style.opacity = '';
+            postingProducts.delete(productKey);
+            if (!posted && !keepVisibleFailure && currentProductKey === productKey) {
+                setShareButtonState('ready');
             }
         }
     }
