@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Ingest Vine CSS for Amazon Vine Pages
 // @namespace    https://github.com/heminp16
-// @version      1.3
+// @version      1.4
 // @description  Injects custom Vine CSS from GitHub and applies review score color-coding.
 // @author       skyline
 // @match        https://www.amazon.com/vine/*
@@ -12,21 +12,52 @@
 (function() {
     'use strict';
 
-    // Inject CSS from GitHub
+    const cssCacheKey = 'VINE_IOS_CSS_CACHE';
+    let style = null;
+    let appliedCSS = '';
+
+    function applyCSS(css) {
+        if (typeof css !== 'string' || !css.trim() || css === appliedCSS) return;
+        if (!style) {
+            style = document.createElement('style');
+            style.textContent = css;
+            document.head.appendChild(style);
+        } else {
+            style.textContent = css;
+        }
+        appliedCSS = css;
+    }
+
+    // Use the saved stylesheet immediately while checking for updates.
+    try {
+        applyCSS(localStorage.getItem(cssCacheKey));
+    } catch (_) {
+        // The network stylesheet still works when browser storage is unavailable.
+    }
+
     GM_xmlhttpRequest({
         method: "GET",
         url: "https://raw.githubusercontent.com/heminp16/Vine-Enhancements/refs/heads/main/ios-tiles-edited.css",
+        timeout: 15000,
         onload: function(response) {
             if (response.status === 200) {
-                const style = document.createElement("style");
-                style.textContent = response.responseText;
-                document.head.appendChild(style);
+                const css = response.responseText;
+                if (typeof css !== 'string' || !css.trim() || css === appliedCSS) return;
+                applyCSS(css);
+                try {
+                    localStorage.setItem(cssCacheKey, css);
+                } catch (_) {
+                    // Keep the applied stylesheet even if the cache cannot be saved.
+                }
             } else {
                 console.error("[Vine CSS] Failed to load CSS. Status:", response.status);
             }
         },
         onerror: function(error) {
             console.error("[Vine CSS] Error loading CSS:", error);
+        },
+        ontimeout: function() {
+            console.warn('[Vine CSS] Update timed out; keeping the saved stylesheet.');
         }
     });
 
