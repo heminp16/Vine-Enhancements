@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.3.2
+// @version      2.3.3
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -152,6 +152,45 @@ NOTES:
                 display: none;
             }
         }
+
+        #product-details-sheet-footer .a-button-discord {
+            flex: 0 0 52px !important;
+            width: 52px !important;
+            height: 52px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border-radius: 50% !important;
+            background: #5865f2 !important;
+            border: 1px solid #4752c4 !important;
+        }
+
+        #product-details-sheet-footer .a-button-discord .a-button-inner,
+        #product-details-sheet-footer .a-button-discord .a-button-text {
+            width: 100% !important;
+            height: 100% !important;
+            padding: 0 !important;
+            gap: 0 !important;
+            background: transparent !important;
+            border-radius: inherit !important;
+        }
+
+        #product-details-sheet-footer .a-button-discord svg.a-button-discord-icon {
+            width: 26px !important;
+            height: 26px !important;
+            min-width: 26px !important;
+            min-height: 26px !important;
+            max-width: 26px !important;
+            max-height: 26px !important;
+            margin: 0 !important;
+        }
+
+        #product-details-sheet-footer .a-button-discord svg path {
+            fill: #fff !important;
+        }
+
+        #product-details-sheet-footer .a-button-discord .a-button-label {
+            display: none !important;
+        }
     `);
 
 
@@ -283,6 +322,7 @@ NOTES:
                     : state === 'failed'
                         ? 'Could not post. Tap to retry.'
                         : 'Share on Discord';
+        if (input) input.setAttribute('aria-label', shareButtonElem.title);
 
         if (input) input.disabled = isDisabled;
         if (label) {
