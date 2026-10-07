@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.3.1
+// @version      2.3.2
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -286,7 +286,7 @@ NOTES:
 
         if (input) input.disabled = isDisabled;
         if (label) {
-            label.textContent =
+            const labelText =
                 state === 'posted'
                     ? 'Posted'
                     : state === 'posting'
@@ -294,6 +294,9 @@ NOTES:
                         : state === 'failed'
                             ? 'Try Again'
                             : 'Share on Discord';
+            if (label.textContent !== labelText) {
+                label.textContent = labelText;
+            }
         }
     }
 
@@ -470,10 +473,12 @@ NOTES:
             } else if (xhr.status >= 200 && xhr.status < 300) {
                 posted = true;
                 markProductPosted(productKey);
-                setShareButtonState('posted');
+                if (currentProductKey === productKey) setShareButtonState('posted');
             } else {
-                setShareButtonState('failed');
-                keepVisibleFailure = true;
+                if (currentProductKey === productKey) {
+                    setShareButtonState('failed');
+                    keepVisibleFailure = true;
+                }
                 console.warn('[VDP] Post failed', {
                     status: xhr.status,
                     response: xhr.responseText
@@ -489,7 +494,14 @@ NOTES:
 
 
     //  Observer
-    const observer = new MutationObserver(() => {
+    const observer = new MutationObserver((records) => {
+        const hasExternalChange = records.some((record) => {
+            const element = record.target.nodeType === 1
+                ? record.target
+                : record.target.parentElement;
+            return !element?.closest('.a-button-discord');
+        });
+        if (!hasExternalChange) return;
         if (getTitleElement()) {
             addShareButton();
         }
