@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Vine Discord Poster - Enhanced
 // @namespace    https://github.com/heminp16
-// @version      2.3.5
+// @version      2.3.6
 // @description  A tool to make posting Vine products to Discord (desktop + mobile) # Rewritten code from `lelouch_di_britannia`
 // @author       skyline + lelouch_di_britannia (Discord)
 // @match        https://www.amazon.com/vine/vine-items*
@@ -542,18 +542,38 @@ NOTES:
     const productSelectors = '#product-details-sheet-title, #product-details-sheet-footer, ' +
         '#vvp-product-details-modal--product-title, .vvp-modal-footer';
     let shareUpdatePending = false;
+    let observedTitle = null;
+    const titleObserver = new MutationObserver(scheduleShareUpdate);
 
     function scheduleShareUpdate() {
         if (shareUpdatePending) return;
         shareUpdatePending = true;
         requestAnimationFrame(() => {
             shareUpdatePending = false;
-            if (getTitleElement()) addShareButton();
+            const title = getTitleElement();
+            if (title !== observedTitle) {
+                titleObserver.disconnect();
+                observedTitle = title;
+                if (title) {
+                    titleObserver.observe(title, {
+                        childList: true,
+                        subtree: true,
+                        characterData: true,
+                        attributes: true,
+                        attributeFilter: ['href']
+                    });
+                }
+            }
+            if (title) addShareButton();
         });
     }
 
     const observer = new MutationObserver((records) => {
         if (shareUpdatePending) return;
+        if (observedTitle && !observedTitle.isConnected) {
+            scheduleShareUpdate();
+            return;
+        }
         const hasProductChange = records.some((record) => {
             const element = record.target.nodeType === 1
                 ? record.target
@@ -577,10 +597,7 @@ NOTES:
 
     observer.observe(document.body, {
         childList: true,
-        subtree: true,
-        characterData: true,
-        attributes: true,
-        attributeFilter: ['href']
+        subtree: true
     });
 
     scheduleShareUpdate();
